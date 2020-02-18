@@ -4,14 +4,29 @@ const mongoose = require('mongoose')
 
 const Product = require('../../models/product')
 
-// Handle incoming GET request for products
+// 'GET' all products
 router.get('/', (req, res, next) => {
-  res.status(200).json({
-    msg: 'GET It works tooooooooooooo'
+  Product.find()
+  .exec()
+  .then(docs => {
+    console.log(docs);
+    if (docs.length > 0) {
+      res.status(200).json(docs);
+    } else {
+        res.status(404).json({
+            message: 'No entries found'
+        });
+    }
   })
+  .catch(err => {
+    console.log(err);
+    res.status(500).json({
+      error: err
+    });
+  });
 })
 
-// Handle incoming POST request for products
+// 'POST' a product 
 router.post('/', (req, res, next) => {
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
@@ -36,7 +51,9 @@ router.post('/', (req, res, next) => {
   })
 })
 
-// Handle incoming GET request for products/{id}
+// ====================================================================
+
+// GET specific product/{id}
 router.get('/:productId', (req, res, next) => {
   const id = req.params.productId
   Product.findById(id)
@@ -58,21 +75,39 @@ router.get('/:productId', (req, res, next) => {
   console.log('damn it', req.params)
 })
 
-// Handle incoming PATCH request for products/{id}
-router.patch('/:productId', (req, res, next) => {
-  const id = req.params.productId
-  res.status(200).json({
-    msg: 'UPDATE',
-    id
-  })
-})
+// PATCH/UPDATE specific products/{id}
+router.patch("/:productId", (req, res, next) => {
+  const id = req.params.productId;
+  const updateOps = {};
+  for (const ops of req.body) {
+    updateOps[ops.propName] = ops.value;
+  }
+  Product.update({ _id: id }, { $set: updateOps })
+    .exec()
+    .then(result => {
+      console.log(result);
+      res.status(200).json(result);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+});
 
-// Handle incoming DELETE request for products/{id}
+// DELETE specific products/{id}
 router.delete('/:productId', (req, res, next) => {
   const id = req.params.productId
-  res.status(200).json({
-    msg: 'DELETE',
-    id
+  Product.remove({_id: id})
+  .exec()
+  .then(result => {
+    res.status(200).json(result)
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err
+    })
   })
 })
 

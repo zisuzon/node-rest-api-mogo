@@ -11,7 +11,7 @@ mongoose.set('useNewUrlParser', true)
 mongoose.set('useUnifiedTopology', true)
 
 mongoose.connect(
-  `mongodb+srv://zisuzon-learning:${process.env.MONGO_ATLAS_PW}@zisuzon-h55bo.mongodb.net/test?retryWrites=true&w=majority`
+  `mongodb+srv://zisuzon:${process.env.MONGO_ATLAS_PW}@cluster0-yejsy.mongodb.net/test?retryWrites=true&w=majority`
   )
 
 app.use(morgan('dev'))
